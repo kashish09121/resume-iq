@@ -1,6 +1,7 @@
 from resume_iq.ingestion.loaders import DocumentLoaderFactory
 from resume_iq.ingestion.models import PreprocessedDocument
 from resume_iq.segmentation.segmenter import SectionSegmenter
+from resume_iq.extraction.orchestrator import InformationExtractor
 
 class ResumeParser:
     """Orchestrator for the ResumeIQ parsing pipeline."""
@@ -18,11 +19,14 @@ class ResumeParser:
         segmenter = SectionSegmenter()
         structured_resume = segmenter.segment(doc)
         
-        # 3. Information Extraction (Planned)
+        # 3. Information Extraction
+        extractor = InformationExtractor()
+        resume_data = extractor.extract(structured_resume)
+        
         # 4. Data Validation and Structuring (Planned)
         
-        # For this milestone, we return the segmented dictionary representation
-        return structured_resume.model_dump()
+        # Return the final Pydantic model dump
+        return resume_data.model_dump()
 
     def _ingest(self, filepath: str) -> PreprocessedDocument:
         """Load and preprocess the document."""
