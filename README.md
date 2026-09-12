@@ -1,69 +1,125 @@
 # ResumeIQ — Automated Resume Analyzer
 
-A modular, local-first automated resume analysis system capable of parsing PDF and DOCX files, extracting raw text, segmenting logical sections, and extracting structured information such as entities, skills, and contact details.
+ResumeIQ is a robust, local-first Automated Resume Analyzer built with Python and FastAPI. It extracts structured data (Contact Information, Experience, Education, Projects, and Skills) from unstructured PDF and DOCX resumes using a combination of heuristic segmentation, Named Entity Recognition (NER), and a curated Skill Ontology engine.
 
-## Current Development Status
-- **Foundation / Environment**: Implemented
-- **Data Models**: Implemented
-- **Configuration**: Implemented
-- **Document Ingestion (PDF/DOCX)**: Planned
-- **Text Normalization**: Planned
-- **Section Segmentation**: Planned
-- **Information Extraction (NER, Regex)**: Planned
-- **Skill Matching**: Planned
-- **API Wrapper**: Planned
-- **Web UI**: Planned
+## Features
 
-## Core Architecture
-ResumeIQ uses a pipelined approach to analyze resumes:
-1. **Document Loader**: Extracts raw text locally (using `pdfminer.six` and `python-docx`).
-2. **Cleaner & Segmenter**: Prepares and chunks the text into logical blocks (e.g. Experience, Education).
-3. **Extractors**: Regex, spaCy NER, and an external skill ontology are used to extract entities.
-4. **Normalizer & Validator**: Normalizes extracted data and validates it via Pydantic models.
-5. **Output**: Exposes the parsed data as structured JSON.
+- **Multi-format Support:** Parses both `.pdf` and `.docx` files natively.
+- **Intelligent Segmentation:** Breaks resumes down into structured canonical sections regardless of formatting.
+- **Skill Extraction Engine:** Utilizes an external JSON ontology to extract skills, resolve aliases (e.g. `React.js` -> `React`), and track exact matched evidence.
+- **Privacy-First:** Processes everything locally. Uploaded files are handled securely via temporary file buffers and are destroyed immediately after processing.
+- **REST API:** FastAPI powered JSON endpoints.
+- **Web UI:** A clean, professional web interface for interacting with the parser.
+- **Zero Paid Dependencies:** Runs entirely on free, open-source libraries without relying on OpenAI or other paid APIs.
 
-## Technology Stack
-- **Language:** Python 3.10+
-- **Parsing:** `pdfminer.six`, `python-docx`
-- **NLP / ML:** `spaCy`
-- **Data Validation:** `Pydantic`
-- **API Backend:** `FastAPI`
-- **Testing:** `pytest`
+## Architecture
 
-## Windows Setup & Installation
-
-ResumeIQ is designed to be fully runnable on a Windows machine.
-
-### 1. Create a Virtual Environment (PowerShell)
-```powershell
-# Create the environment
-python -m venv .venv
-
-# Activate the environment
-.\.venv\Scripts\Activate.ps1
+```text
+    User / Web UI
+          │
+          ▼
+   POST /api/v1/parse (FastAPI)
+          │
+          ▼
+    ResumeParser (Orchestrator)
+          │
+          ├── Ingestion (PDFLoader / DOCXLoader)
+          │
+          ├── Preprocessing (Whitespace, bullets, encoding)
+          │
+          ├── Section Segmentation (Heuristic mapping to standard headers)
+          │
+          ├── Information Extraction (Regex + spaCy NER with fallback)
+          │
+          └── Skill Intelligence (Regex multi-pattern ontology matcher)
+          │
+          ▼
+   Structured JSON Response (Pydantic validated)
 ```
 
-### 2. Install Dependencies
+## Tech Stack
+
+- **Backend:** Python 3.11, FastAPI, Uvicorn, Pydantic
+- **Extraction:** pdfminer.six (PDF), python-docx (DOCX)
+- **NLP:** spaCy (`en_core_web_sm`), Regex (re)
+- **Frontend:** Vanilla HTML/CSS/JS (served via FastAPI StaticFiles)
+- **Testing:** pytest, httpx
+
+## NLP Pipeline & Skill Ontology
+
+ResumeIQ doesn't rely on simplistic keyword matching. The NLP pipeline uses:
+- **Heuristics & Regex:** Safely extracts emails, phones, and URLs.
+- **Named Entity Recognition (NER):** Uses spaCy to isolate `PERSON` (Candidate Name) and `ORG` (Universities, Companies). Includes a pure-Python fallback algorithm for environments where C-compiled DLLs (like spaCy/lxml) are blocked by system policies.
+- **Skill Ontology:** An external JSON knowledge base (`data/ontology/skills.json`) acts as the source of truth for technical and soft skills. The `SkillExtractor` compiles these into boundary-safe regular expressions to prevent false positives (e.g. "C" won't match inside "Cat" or "C++"), resolving aliases ("Python 3") back to canonical forms ("Python").
+
+## Installation
+
+_This guide is optimized for Windows development environments._
+
+1. **Clone the repository:**
+   ```powershell
+   git clone https://github.com/kashish09121/resume-iq.git
+   cd resume-iq
+   ```
+
+2. **Create a virtual environment and activate it:**
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+3. **Install dependencies:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+
+4. **Install the NLP Model (Optional but Recommended):**
+   ```powershell
+   python -m spacy download en_core_web_sm
+   ```
+   _Note: If spaCy fails to load due to strict execution policies, the system automatically falls back to heuristic extraction without crashing._
+
+## Usage
+
+### Start the Application
+
+Run the application using Uvicorn:
+
 ```powershell
-# Install project in editable mode with development dependencies
-pip install -e ".[dev]"
+uvicorn resume_iq.api.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### 3. NLP Model Management (spaCy)
-ResumeIQ currently uses the `en_core_web_sm` model. You must download it before running the extractors:
-```powershell
-python -m spacy download en_core_web_sm
-```
+### Access the UI
+Open your browser and navigate to: **http://127.0.0.1:8000**
 
-### 4. Run Tests
-Verify your installation by running the foundation test suite:
+### API Endpoints
+
+- `GET /api/v1/health` - Health check.
+- `POST /api/v1/parse` - Upload a resume (`multipart/form-data` with `file` key). Returns a highly structured JSON representation of the resume.
+- `GET /docs` - Interactive Swagger API documentation.
+
+## Testing
+
+ResumeIQ is fully tested across all modules.
+
+To run the complete test suite (Unit + Integration):
 ```powershell
-pytest
+pytest tests/
 ```
 
 ## Privacy & Security
-- **Local-first**: The parsing engine runs entirely on your local hardware. No resumes are sent to third-party APIs or cloud services.
-- **Data Retention**: By design, temporary files are used during upload/parsing and are immediately deleted. No PII is logged.
+
+- **Temporary Processing:** Uploads are streamed to a short-lived temporary file created via `tempfile.mkstemp`, which is deleted in a `finally` block before the HTTP request returns.
+- **Local First:** No data ever leaves the host machine.
+- **Size Limits:** Uploads are capped at 10MB to prevent memory exhaustion attacks.
+- **File Validation:** Strictly validates file extensions and sizes before loading.
+
+## Limitations
+
+- Currently cannot OCR scanned image-based PDFs.
+- Highly unusual or visually complex multi-column layouts may occasionally confuse the heuristic segmenter.
+- The Skill Matcher only detects skills listed in the `skills.json` ontology. Novel skills not present in the JSON will not be extracted.
 
 ## License
-Copyright (c) 2026 Kashish. Licensed under the MIT License.
+
+Copyright (c) 2026 Kashish. Licensed under the [MIT License](LICENSE).
