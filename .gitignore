@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+data/sample_resumes/*
+!data/sample_resumes/.gitkeep
+tests/fixtures/*
+!tests/fixtures/.gitkeep
+
+# Ignore temporary files created during parsing
+*.tmp
+temp/
