@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from resume_iq.models.resume import Resume, Contact, Experience, Education
 from resume_iq.segmentation.models import StructuredResume, Section
 from resume_iq.extraction.regex_extractors import RegexExtractor
@@ -61,13 +61,54 @@ class InformationExtractor:
         # 5. Extract Projects (Basic assignment for this milestone)
         if "projects" in structured.sections:
             for proj_section in structured.sections["projects"]:
-                # Just keep raw lines for now, M6 might handle deeper project NLP
                 resume.projects.append("\n".join(proj_section.lines))
 
+        # 6. Extract Skills across sections
+        from resume_iq.extraction.skill_extractor import SkillExtractor
+        skill_extractor = SkillExtractor()
+        
+        # Merge dictionary mapping canonical_name -> Skill object
+        all_skills = {}
+        
+        # 6a. Explicit skills section
+        if "skills" in structured.sections:
+            for skill_sec in structured.sections["skills"]:
+                text = "\n".join(skill_sec.lines)
+                extracted = skill_extractor.extract_from_text(text, "skills")
+                self._merge_skills(all_skills, extracted)
+                
+        # 6b. Experience sections
+        if "experience" in structured.sections:
+            for exp_sec in structured.sections["experience"]:
+                text = "\n".join(exp_sec.lines)
+                extracted = skill_extractor.extract_from_text(text, "experience")
+                self._merge_skills(all_skills, extracted)
+                
+        # 6c. Project sections
+        if "projects" in structured.sections:
+            for proj_sec in structured.sections["projects"]:
+                text = "\n".join(proj_sec.lines)
+                extracted = skill_extractor.extract_from_text(text, "projects")
+                self._merge_skills(all_skills, extracted)
+                
+        resume.skills = list(all_skills.values())
+
         # Store metadata about extraction
-        resume.metadata["extraction_methods_used"] = ["Regex", "spaCy NER", "Heuristic"]
+        resume.metadata["extraction_methods_used"] = ["Regex", "spaCy NER", "Heuristic", "Ontology"]
         
         return resume
+
+    def _merge_skills(self, all_skills: Dict[str, Any], new_skills: List[Any]):
+        """Merges new extracted skills into the tracking dictionary to deduplicate globally."""
+        for skill in new_skills:
+            if skill.canonical_name not in all_skills:
+                all_skills[skill.canonical_name] = skill
+            else:
+                existing = all_skills[skill.canonical_name]
+                for alias in skill.aliases_matched:
+                    if alias not in existing.aliases_matched:
+                        existing.aliases_matched.append(alias)
+                existing.evidence.extend(skill.evidence)
 
     def _extract_contact(self, contact_section: Section) -> Contact:
         text = "\n".join(contact_section.lines)

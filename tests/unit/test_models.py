@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from resume_iq.models.resume import Resume, Contact, Experience
+from resume_iq.models.resume import Resume, Contact, Experience, Skill
 
 def test_resume_model_instantiation():
     """Test that a Resume model can be instantiated with default/empty fields."""
@@ -18,9 +18,9 @@ def test_resume_model_validation():
     resume = Resume(
         contact=Contact(**contact_data),
         experience=[Experience(**exp_data)],
-        skills=["Python", "FastAPI"]
+        skills=[Skill(canonical_name="Python"), Skill(canonical_name="FastAPI")]
     )
     
     assert resume.contact.name == "Alice Smith"
     assert resume.experience[0].company == "Tech Corp"
-    assert "Python" in resume.skills
+    assert resume.skills[0].canonical_name == "Python"

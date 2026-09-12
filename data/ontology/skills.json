@@ -1,0 +1,239 @@
+{
+  "ontology_version": "1.0.0",
+  "skills": [
+    {
+      "canonical_name": "Python",
+      "aliases": ["Python 3", "Python3", "Py"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Java",
+      "aliases": ["Java 8", "Java 11", "Java 17", "Core Java"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "C++",
+      "aliases": ["CPP", "C Plus Plus"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "C",
+      "aliases": [],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "C#",
+      "aliases": ["CSharp", "C Sharp"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "JavaScript",
+      "aliases": ["JS", "Javascript", "Vanilla JS", "ECMAScript"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "TypeScript",
+      "aliases": ["TS", "Typescript"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Go",
+      "aliases": ["Golang"],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Rust",
+      "aliases": [],
+      "category": "Programming Languages",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Machine Learning",
+      "aliases": ["ML", "Machine-Learning"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Deep Learning",
+      "aliases": ["DL", "Deep-Learning"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Natural Language Processing",
+      "aliases": ["NLP"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Computer Vision",
+      "aliases": ["CV"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "TensorFlow",
+      "aliases": ["TF", "Tensor Flow"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "PyTorch",
+      "aliases": ["Torch"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "scikit-learn",
+      "aliases": ["sklearn", "scikit learn"],
+      "category": "AI/ML",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "SQL",
+      "aliases": ["Structured Query Language"],
+      "category": "Databases",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "PostgreSQL",
+      "aliases": ["Postgres", "Postgres SQL"],
+      "category": "Databases",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "MySQL",
+      "aliases": ["My SQL"],
+      "category": "Databases",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "MongoDB",
+      "aliases": ["Mongo", "Mongo DB"],
+      "category": "Databases",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Pandas",
+      "aliases": [],
+      "category": "Data",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "NumPy",
+      "aliases": ["Numpy"],
+      "category": "Data",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "HTML",
+      "aliases": ["HTML5"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "CSS",
+      "aliases": ["CSS3"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "React",
+      "aliases": ["ReactJS", "React.js", "React JS"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Angular",
+      "aliases": ["AngularJS", "Angular.js"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Vue.js",
+      "aliases": ["Vue", "VueJS", "Vue JS"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Node.js",
+      "aliases": ["Node", "NodeJS", "Node JS"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "FastAPI",
+      "aliases": ["Fast API"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "REST API",
+      "aliases": ["REST", "RESTful API", "REST APIs"],
+      "category": "Web Development",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Docker",
+      "aliases": [],
+      "category": "DevOps",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Kubernetes",
+      "aliases": ["K8s"],
+      "category": "DevOps",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "AWS",
+      "aliases": ["Amazon Web Services"],
+      "category": "Cloud",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "GCP",
+      "aliases": ["Google Cloud", "Google Cloud Platform"],
+      "category": "Cloud",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Azure",
+      "aliases": ["Microsoft Azure"],
+      "category": "Cloud",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Git",
+      "aliases": [],
+      "category": "Tools",
+      "skill_type": "technical"
+    },
+    {
+      "canonical_name": "Communication",
+      "aliases": ["Verbal Communication", "Written Communication"],
+      "category": "Soft Skills",
+      "skill_type": "soft"
+    },
+    {
+      "canonical_name": "Leadership",
+      "aliases": ["Team Leadership"],
+      "category": "Soft Skills",
+      "skill_type": "soft"
+    },
+    {
+      "canonical_name": "Teamwork",
+      "aliases": ["Collaborative", "Collaboration"],
+      "category": "Soft Skills",
+      "skill_type": "soft"
+    }
+  ]
+}
