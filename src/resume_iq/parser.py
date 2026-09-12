@@ -1,5 +1,6 @@
 from resume_iq.ingestion.loaders import DocumentLoaderFactory
 from resume_iq.ingestion.models import PreprocessedDocument
+from resume_iq.segmentation.segmenter import SectionSegmenter
 
 class ResumeParser:
     """Orchestrator for the ResumeIQ parsing pipeline."""
@@ -13,18 +14,15 @@ class ResumeParser:
         # 1. Ingestion and Preprocessing
         doc = self._ingest(filepath)
         
-        # 2. Section Segmentation (Planned for Next Milestone)
+        # 2. Section Segmentation
+        segmenter = SectionSegmenter()
+        structured_resume = segmenter.segment(doc)
+        
         # 3. Information Extraction (Planned)
         # 4. Data Validation and Structuring (Planned)
         
-        # For this milestone, we simply return the preprocessed document representation
-        # to prove the ingestion layer works.
-        return {
-            "source": doc.source_name,
-            "type": doc.source_type,
-            "lines": doc.lines,
-            "status": "ingested"
-        }
+        # For this milestone, we return the segmented dictionary representation
+        return structured_resume.model_dump()
 
     def _ingest(self, filepath: str) -> PreprocessedDocument:
         """Load and preprocess the document."""
