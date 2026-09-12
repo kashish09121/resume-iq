@@ -1,101 +1,96 @@
 import os
-import shutil
 import tempfile
 import time
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from typing import Dict, Any
+from fastapi import FastAPI, File, UploadFile, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
 from resume_iq.parser import ResumeParser
 from resume_iq.models.resume import Resume
 
 # Configuration
-MAX_FILE_SIZE_MB = 10
-MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+MAX_UPLOAD_SIZE_MB = 5
+MAX_UPLOAD_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 ALLOWED_EXTENSIONS = {".pdf", ".docx"}
 
 app = FastAPI(
     title="ResumeIQ API",
-    description="Automated Resume Analyzer Backend API",
+    description="Automated Resume Analyzer API",
     version="1.0.0"
 )
 
-# CORS configuration for local development
+# Allow CORS for UI access (configurable for prod, permissive for local dev)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Configurable in production
+    allow_origins=["*"],  # For local development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/api/v1/health")
+@app.get("/health", summary="Health Check")
 async def health_check():
     return {"status": "ok"}
 
-@app.post("/api/v1/parse", response_model=Resume)
+@app.post("/api/v1/parse", response_model=Resume, summary="Parse a resume file (PDF or DOCX)")
 async def parse_resume(file: UploadFile = File(...)):
-    start_time = time.time()
-    
-    # Validation 1: Check filename and extension
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No filename provided.")
-        
-    ext = os.path.splitext(file.filename)[1].lower()
+    if not file:
+        raise HTTPException(status_code=400, detail="No file uploaded.")
+
+    filename = file.filename
+    if not filename:
+        raise HTTPException(status_code=400, detail="Uploaded file has no filename.")
+
+    # Extension validation
+    ext = os.path.splitext(filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Unsupported file format. Allowed: {', '.join(ALLOWED_EXTENSIONS)}")
-        
-    # Validation 2: Check file size by reading chunk
-    file.file.seek(0, 2)
-    file_size = file.file.tell()
-    file.file.seek(0)
+        raise HTTPException(
+            status_code=415,
+            detail=f"Unsupported file format '{ext}'. Please upload a PDF or DOCX resume."
+        )
+
+    # Size validation (read into memory, verify, then write to temp)
+    file_content = await file.read()
+    if len(file_content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Maximum allowed size is {MAX_UPLOAD_SIZE_MB}MB."
+        )
     
-    if file_size > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(status_code=413, detail=f"File exceeds maximum allowed size of {MAX_FILE_SIZE_MB}MB.")
-        
-    if file_size == 0:
+    if len(file_content) == 0:
         raise HTTPException(status_code=400, detail="Empty file uploaded.")
-        
-    # Create temporary file safely
-    temp_fd, temp_path = tempfile.mkstemp(suffix=ext)
-    os.close(temp_fd) # Close it so we can open it via shutil
-    
+
+    # Secure temporary file handling
+    fd, temp_path = tempfile.mkstemp(suffix=ext)
     try:
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-            
-        # Orchestrate the parser
+        with os.fdopen(fd, 'wb') as f:
+            f.write(file_content)
+        
+        start_time = time.time()
+        
+        # Orchestrate processing
         parser = ResumeParser()
         try:
-            resume_dict = parser.parse(temp_path)
-            # Parse dict back into Resume model for validation and metadata appending
-            resume = Resume(**resume_dict)
-            
-            # Add API-level metadata
-            processing_time = round(time.time() - start_time, 2)
-            resume.metadata["processing_time_sec"] = processing_time
-            resume.metadata["source_type"] = ext.replace(".", "")
-            
-            return resume
-            
-        except ValueError as ve:
-            # Handle known parser errors (like no text extracted)
-            raise HTTPException(status_code=422, detail=str(ve))
+            resume: Resume = parser.parse(temp_path)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
         except Exception as e:
-            # Catch-all for unexpected parser crashes
-            raise HTTPException(status_code=500, detail="An error occurred while processing the resume.")
+            # Internal processing error
+            raise HTTPException(status_code=500, detail="The resume could not be processed.")
             
+        process_time = time.time() - start_time
+        
+        # Embed metadata
+        resume.metadata["processing_time_ms"] = int(process_time * 1000)
+        resume.metadata["source_type"] = ext.lstrip(".")
+        
+        return resume
+        
     finally:
-        # Cleanup temporary file reliably
+        # Guarantee cleanup for privacy and disk space
         if os.path.exists(temp_path):
             try:
                 os.remove(temp_path)
-            except OSError:
-                pass # Silent cleanup failure
-
-# Mount frontend static files
-# Ensure the 'static' directory exists before mounting to avoid startup errors
-os.makedirs("static", exist_ok=True)
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+            except Exception:
+                pass

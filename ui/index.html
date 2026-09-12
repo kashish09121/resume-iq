@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeIQ - Automated Resume Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <div class="container">
+            <h1>ResumeIQ</h1>
+            <p>Automated Resume Analyzer</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <section id="upload-section" class="card fade-in">
+            <h2>Upload your resume</h2>
+            <div id="drop-zone" class="drop-zone">
+                <p>Drag & Drop your resume here</p>
+                <p class="text-muted">or</p>
+                <label class="btn btn-primary" for="file-input">Choose File</label>
+                <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+                <p class="text-sm text-muted mt-2">Supported formats: PDF, DOCX (Max 5MB)</p>
+            </div>
+            <div id="file-info" class="file-info hidden">
+                <span id="file-name" class="font-medium"></span>
+                <button id="btn-remove" class="btn btn-text text-danger">Remove</button>
+            </div>
+            
+            <div id="error-message" class="alert alert-danger hidden"></div>
+
+            <div class="action-bar mt-4">
+                <button id="btn-analyze" class="btn btn-primary btn-block" disabled>Analyze</button>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loading-section" class="card hidden text-center">
+            <div class="spinner"></div>
+            <h3 class="mt-4">Analyzing resume...</h3>
+            <p class="text-muted" id="loading-stage">Reading document...</p>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="hidden fade-in">
+            <div class="action-bar-top">
+                <h2>Analysis Result</h2>
+                <button id="btn-reset" class="btn btn-secondary">Analyze Another Resume</button>
+            </div>
+
+            <div class="grid grid-2">
+                <!-- Candidate & Contact -->
+                <div class="card">
+                    <h3>Candidate</h3>
+                    <p class="result-text" id="res-name">Not detected</p>
+                    
+                    <h3 class="mt-4">Contact</h3>
+                    <ul class="contact-list">
+                        <li><strong>Email:</strong> <span id="res-email">Not detected</span></li>
+                        <li><strong>Phone:</strong> <span id="res-phone">Not detected</span></li>
+                        <li><strong>LinkedIn:</strong> <span id="res-linkedin">Not detected</span></li>
+                        <li><strong>Portfolio:</strong> <span id="res-portfolio">Not detected</span></li>
+                    </ul>
+                </div>
+
+                <!-- Summary -->
+                <div class="card">
+                    <h3>Summary</h3>
+                    <p class="result-text" id="res-summary">Not detected</p>
+                </div>
+            </div>
+
+            <!-- Experience -->
+            <div class="card mt-4">
+                <h3>Experience</h3>
+                <div id="res-experience" class="list-container">
+                    <p class="text-muted">Not detected</p>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="card mt-4">
+                <h3>Education</h3>
+                <div id="res-education" class="list-container">
+                    <p class="text-muted">Not detected</p>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="card mt-4">
+                <h3>Projects</h3>
+                <div id="res-projects" class="list-container">
+                    <p class="text-muted">Not detected</p>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="card mt-4">
+                <div class="header-with-meta">
+                    <h3>Skills</h3>
+                    <span id="res-skills-count" class="badge">0 detected</span>
+                </div>
+                <div id="res-skills" class="skills-grid">
+                    <p class="text-muted">Not detected</p>
+                </div>
+            </div>
+            
+            <div id="warning-message" class="alert alert-warning mt-4 hidden"></div>
+
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
