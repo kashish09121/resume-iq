@@ -10,8 +10,14 @@ def test_extract_email():
     assert RegexExtractor.extract_email("No email here") is None
 
 def test_extract_phone():
-    assert RegexExtractor.extract_phone("Call +91 9876543210") == "+91 9876543210"
-    assert RegexExtractor.extract_phone("Or (555) 123-4567") == "(555) 123-4567"
+    # Valid international
+    assert RegexExtractor.extract_phone("Call +91 98765 43210") == "+919876543210"
+    assert RegexExtractor.extract_phone("+91-98765-43210") == "+919876543210"
+    # Ambiguous but valid in default region (IN)
+    assert RegexExtractor.extract_phone("9876543210") == "+919876543210"
+    # Other country (US)
+    assert RegexExtractor.extract_phone("+1 415 555 0100") == "+14155550100"
+    # Invalid
     assert RegexExtractor.extract_phone("My zip code is 12345") is None # Too short
 
 def test_extract_urls():
@@ -77,6 +83,7 @@ def test_orchestrator():
     assert exp.job_title == "Software Engineer"
     assert exp.start_date == "Jan 2024"
     assert exp.end_date == "Present"
+    assert exp.dates == "Jan 2024 - Present"
     
     # Education
     assert len(resume.education) == 1

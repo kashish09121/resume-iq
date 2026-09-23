@@ -18,6 +18,7 @@ class Education(BaseModel):
 class Experience(BaseModel):
     company: Optional[str] = None
     job_title: Optional[str] = None
+    dates: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     description: Optional[str] = None

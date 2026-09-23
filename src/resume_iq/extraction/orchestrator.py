@@ -146,6 +146,7 @@ class InformationExtractor:
             if start:
                 exp.start_date = start
                 exp.end_date = end
+                exp.dates = line.strip()
                 break
                 
         # Assume job title might be in the first 2 lines
@@ -179,7 +180,9 @@ class InformationExtractor:
         
         # Extract Institution via NER
         entities = NERExtractor.extract_entities(text)
-        if "ORG" in entities and entities["ORG"]:
+        if "UNIVERSITY" in entities and entities["UNIVERSITY"]:
+            edu.institution = entities["UNIVERSITY"][0]
+        elif "ORG" in entities and entities["ORG"]:
             # Universities are usually ORGs
             edu.institution = entities["ORG"][0]
             
@@ -192,17 +195,25 @@ class InformationExtractor:
                 break
                 
         # Extract Degree
-        for line in lines:
-            match = self.DEGREE_PATTERN.search(line)
-            if match:
-                raw_deg = match.group(0)
-                clean_deg = re.sub(r'[^a-z0-9]', '', raw_deg.lower())
-                
-                # Try normalization
-                edu.degree = self.DEGREE_ALIASES.get(clean_deg, raw_deg)
-                
-                # The whole line might be the field (e.g. B.Tech in Computer Science)
-                edu.field = line.strip()
-                break
+        if "DEGREE" in entities and entities["DEGREE"]:
+            edu.degree = entities["DEGREE"][0]
+            # Try to get field heuristically
+            for line in lines:
+                if edu.degree in line:
+                    edu.field = line.strip()
+                    break
+        else:
+            for line in lines:
+                match = self.DEGREE_PATTERN.search(line)
+                if match:
+                    raw_deg = match.group(0)
+                    clean_deg = re.sub(r'[^a-z0-9]', '', raw_deg.lower())
+                    
+                    # Try normalization
+                    edu.degree = self.DEGREE_ALIASES.get(clean_deg, raw_deg)
+                    
+                    # The whole line might be the field (e.g. B.Tech in Computer Science)
+                    edu.field = line.strip()
+                    break
                 
         return [edu]

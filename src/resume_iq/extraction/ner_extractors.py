@@ -12,17 +12,31 @@ except ImportError:
 class NLPModelLoader:
     """Singleton to load the spaCy model efficiently once per lifecycle."""
     _model = None
+    _is_custom = False
 
     @classmethod
     def get_model(cls):
         if not SPACY_AVAILABLE:
-            return None
+            return None, False
         if cls._model is None:
+            import os
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            custom_model_path = os.path.join(base_dir, "models", "custom_ner")
+            
+            if os.path.exists(custom_model_path):
+                try:
+                    cls._model = spacy.load(custom_model_path)
+                    cls._is_custom = True
+                    return cls._model, True
+                except Exception:
+                    pass
+            
             try:
                 cls._model = spacy.load("en_core_web_sm")
+                cls._is_custom = False
             except OSError:
-                return None # Model not downloaded
-        return cls._model
+                return None, False # Model not downloaded
+        return cls._model, cls._is_custom
 
 class NERExtractor:
     """Semantic extraction using spaCy NER, with a heuristic fallback."""
@@ -30,7 +44,7 @@ class NERExtractor:
     @classmethod
     def extract_entities(cls, text: str) -> Dict[str, List[str]]:
         """Extract all entities from a block of text, grouped by label."""
-        nlp = NLPModelLoader.get_model()
+        nlp, is_custom = NLPModelLoader.get_model()
         entities = {}
         
         if nlp:
@@ -55,13 +69,16 @@ class NERExtractor:
     @classmethod
     def extract_candidate_name(cls, contact_lines: List[str], email: Optional[str] = None) -> Optional[str]:
         """Robustly extracts the candidate name from contact section lines."""
-        nlp = NLPModelLoader.get_model()
+        nlp, is_custom = NLPModelLoader.get_model()
         
         for line in contact_lines:
             persons = []
             if nlp:
                 doc = nlp(line)
-                persons = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
+                if is_custom:
+                    persons = [ent.text for ent in doc.ents if ent.label_ == "CANDIDATE_NAME"]
+                else:
+                    persons = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
             else:
                 # Heuristic PERSON fallback: 2-3 capitalized words in a short line
                 words = line.strip().split()

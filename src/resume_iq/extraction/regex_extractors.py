@@ -8,7 +8,7 @@ class RegexExtractor:
     EMAIL_PATTERN = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
     
     # Phone pattern: supports optional country code, dashes, parentheses, spaces
-    PHONE_PATTERN = re.compile(r'(?:(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{3,4})')
+    PHONE_PATTERN = re.compile(r'(?:(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5})')
     
     # LinkedIn pattern
     LINKEDIN_PATTERN = re.compile(r'(?:https?://)?(?:www\.)?linkedin\.com/in/[a-zA-Z0-9_-]+')
@@ -25,15 +25,24 @@ class RegexExtractor:
 
     @classmethod
     def extract_phone(cls, text: str) -> Optional[str]:
-        # Since the generic phone regex can match arbitrary numbers (like zip codes or IDs),
-        # we enforce length and structure heuristics on the matched string.
+        try:
+            import phonenumbers
+        except ImportError:
+            phonenumbers = None
+
         matches = cls.PHONE_PATTERN.findall(text)
         for match in matches:
-            # Strip non-digits to check core length
             digits = re.sub(r'\D', '', match)
             if 10 <= len(digits) <= 15:
-                # Basic validation: normal phone numbers are 10-15 digits
-                return match.strip()
+                if phonenumbers:
+                    try:
+                        parsed = phonenumbers.parse(match.strip(), "IN")
+                        if phonenumbers.is_valid_number(parsed):
+                            return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+                    except phonenumbers.NumberParseException:
+                        pass
+                else:
+                    return match.strip()
         return None
 
     @classmethod

@@ -13,7 +13,7 @@ def test_resume_model_instantiation():
 def test_resume_model_validation():
     """Test that valid nested data works correctly."""
     contact_data = {"name": "Alice Smith", "email": "alice@example.com"}
-    exp_data = {"company": "Tech Corp", "job_title": "Engineer"}
+    exp_data = {"company": "Tech Corp", "job_title": "Engineer", "dates": "Jan 2024 - Present", "start_date": "Jan 2024", "end_date": "Present"}
     
     resume = Resume(
         contact=Contact(**contact_data),
@@ -23,4 +23,5 @@ def test_resume_model_validation():
     
     assert resume.contact.name == "Alice Smith"
     assert resume.experience[0].company == "Tech Corp"
+    assert resume.experience[0].dates == "Jan 2024 - Present"
     assert resume.skills[0].canonical_name == "Python"

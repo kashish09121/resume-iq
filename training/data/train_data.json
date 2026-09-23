@@ -1,0 +1,42 @@
+[
+  {
+    "text": "Aarav Sharma\njohn.doe@example.com\nB.Tech in Computer Science\nPune Institute of Technology",
+    "entities": {"Aarav Sharma": "CANDIDATE_NAME", "B.Tech": "DEGREE", "Pune Institute of Technology": "UNIVERSITY"}
+  },
+  {
+    "text": "Jane Doe, Data Scientist\njane@doe.com\nMaster of Technology\nIndian Institute of Technology",
+    "entities": {"Jane Doe": "CANDIDATE_NAME", "Master of Technology": "DEGREE", "Indian Institute of Technology": "UNIVERSITY"}
+  },
+  {
+    "text": "ROHIT VERMA\n+91 9876543210\nB.E. Mechanical Engineering\nDelhi Technological University",
+    "entities": {"ROHIT VERMA": "CANDIDATE_NAME", "B.E.": "DEGREE", "Delhi Technological University": "UNIVERSITY"}
+  },
+  {
+    "text": "EDUCATION\nBachelor of Engineering in Electronics\nNational Institute of Technology",
+    "entities": {"Bachelor of Engineering": "DEGREE", "National Institute of Technology": "UNIVERSITY"}
+  },
+  {
+    "text": "Priya Singh\npriya.s@gmail.com\nB.Sc Computer Applications\nSymbiosis International University",
+    "entities": {"Priya Singh": "CANDIDATE_NAME", "B.Sc": "DEGREE", "Symbiosis International University": "UNIVERSITY"}
+  },
+  {
+    "text": "Contact: Arjun Reddy\nArjun.Reddy@domain.com\nM.Tech Software Engineering\nBirla Institute of Technology and Science",
+    "entities": {"Arjun Reddy": "CANDIDATE_NAME", "M.Tech": "DEGREE", "Birla Institute of Technology and Science": "UNIVERSITY"}
+  },
+  {
+    "text": "AMIT KUMAR PATEL\nB.Tech Information Technology\nVellore Institute of Technology",
+    "entities": {"AMIT KUMAR PATEL": "CANDIDATE_NAME", "B.Tech": "DEGREE", "Vellore Institute of Technology": "UNIVERSITY"}
+  },
+  {
+    "text": "Sarah Jenkins\nMBA in Marketing\nHarvard Business School",
+    "entities": {"Sarah Jenkins": "CANDIDATE_NAME", "MBA": "DEGREE", "Harvard Business School": "UNIVERSITY"}
+  },
+  {
+    "text": "John Appleseed\nMCA\nStanford University",
+    "entities": {"John Appleseed": "CANDIDATE_NAME", "MCA": "DEGREE", "Stanford University": "UNIVERSITY"}
+  },
+  {
+    "text": "Nikhil Agarwal\nnikhil@email.com\nDoctorate in Physics\nMassachusetts Institute of Technology",
+    "entities": {"Nikhil Agarwal": "CANDIDATE_NAME", "Doctorate": "DEGREE", "Massachusetts Institute of Technology": "UNIVERSITY"}
+  }
+]

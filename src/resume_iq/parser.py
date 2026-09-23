@@ -28,6 +28,10 @@ class ResumeParser:
         # Return the final Pydantic model dump
         return resume_data.model_dump()
 
+    def parsefile(self, filepath: str) -> dict:
+        """Alias for parse() to satisfy the class method API requirement."""
+        return self.parse(filepath)
+
     def _ingest(self, filepath: str) -> PreprocessedDocument:
         """Load and preprocess the document."""
         loader = DocumentLoaderFactory.get_loader(filepath)
